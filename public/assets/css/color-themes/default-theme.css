@@ -74,7 +74,7 @@ a,
 .shop-page .prod-tabs .add-review .rating .rate-box:hover,
 .shop-page .prod-tabs .add-review .rating .rate-box:focus,
 .shop-page .prod-tabs .add-review .rating .rate-box:active{
-	color:#1c63b8;
+	color:#FF671F;
 }
 
 /*Background Color*/
@@ -139,16 +139,16 @@ a,
 .blog-cat-two li.active a, .blog-cat-two li a:hover,
 .news-block-two .inner-box .image .overlay-box .icon,
 .main-header .header-top-two .language .dropdown-menu > li > a:hover{
-	background-color:#1c63b8;
+	background-color:#FF671F;
 }
 
 .services-block .inner-box:hover .image .overflow-box:before{
-	background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, #1c63b8 100%);
-	background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, #1c63b8 100%);
-	background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, #1c63b8 100%);
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255,255,255,0)), color-stop(100, #1c63b8));
-	background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, #1c63b8 100%);
-	background-image: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #1c63b8 100%);
+	background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, #FF671F 100%);
+	background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, #FF671F 100%);
+	background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, #FF671F 100%);
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(255,255,255,0)), color-stop(100, #FF671F));
+	background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, #FF671F 100%);
+	background-image: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #FF671F 100%);
 }
 
 /*Border Color*/
@@ -203,11 +203,11 @@ a,
 .contact-form .form-group input[type="email"]:focus,
 .contact-form .form-group select:focus,
 .contact-form .form-group textarea:focus{
-	border-color:#1c63b8;
+	border-color:#FF671F;
 }
 
 .price-block .inner-box .ribbon:before{
-	border-top-color:#1c63b8;
+	border-top-color:#FF671F;
 }
 
 /*RGBA Color Light*/
@@ -227,7 +227,7 @@ a,
 @media only screen and (max-width: 767px){
 	
 	.main-menu .navbar-header .navbar-toggle{
-		border-color:#1c63b8;
+		border-color:#FF671F;
 	}
 	
 	.main-menu .navbar-header .navbar-toggle,
@@ -246,7 +246,7 @@ a,
 	.main-menu .navbar-collapse > .navigation > li.current > a,
 	.main-menu .navbar-collapse > .navigation > li.current-menu-item > a,
 	.header-style-two.inner-header .main-menu .navigation > li > a{
-		background-color:#1c63b8;
+		background-color:#FF671F;
 	}
 	
 }

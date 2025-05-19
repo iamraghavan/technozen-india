@@ -3,7 +3,16 @@ exports.homePage = (req, res) => {
 };
 
 exports.aboutPage = (req, res) => {
-  res.render('about', { title: 'About Us' });
+  const breadcrumbs = [
+    { text: 'Home', link: '/' }, 
+    { text: 'About', link: '/about' }
+  ];
+  const pageTitle = 'About Us';
+  
+  res.render('about', { 
+    title: pageTitle,
+    breadcrumbs: breadcrumbs
+  });
 };
 
 exports.contactPage = (req, res) => {

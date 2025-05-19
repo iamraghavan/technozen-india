@@ -1,0 +1,94 @@
+<!-- Main Template (about.ejs) -->
+ <%- include('partials/header') %>
+
+<%- include('partials/breadcrumbs', { 
+    title: title, 
+    breadcrumbs: breadcrumbs 
+}) %>
+
+<!-- Why Us Section -->
+<section class="why-us-section">
+    <div class="auto-container">
+
+        <!-- Features Tab -->
+        <div class="feature-tabs tabs-box">
+            <div class="row clearfix">
+                <div class="content-column pull-right col-lg-7 col-md-12 col-sm-12">
+                    <!--Tabs Container-->
+                    <div class="tabs-content">
+                        <!--Tab / Active Tab-->
+                        <div class="tab active-tab" id="feature-tab-1">
+                            <div class="inner-box">
+                                <span class="title">Why Choose Us?</span>
+                                <h2>Authorized Certification Center</h2>
+                                <p>At Khodiyar CAD Center India Pvt. Ltd., we offer top-tier training programs in SolidWorks and CNC programming, tailored to meet the needs of both students and industry professionals. We are an Authorized Certification Center & Authorized Channel Partner of Autodesk, providing the highest standards of education and hands-on learning experiences.</p>
+                                <ul class="list-style-two">
+                                    <li>SolidWorks & CNC Program Training</li>
+                                    <li>Authorized Certification Center by Autodesk</li>
+                                    <li>Industry-relevant Training Programs</li>
+                                    <li>Certified Autodesk Channel Partner</li>
+                                    <li>Started in 2025 with a focus on practical learning</li>
+                                </ul>
+                                <a href="#" class="theme-btn btn-style-one"><span class="txt">What Client Said</span></a>
+                            </div>
+                        </div>
+
+                        <!--Tab -->
+                        <div class="tab" id="feature-tab-2">
+                            <div class="inner-box">
+                                <span class="title">Why Choose Us?</span>
+                                <h2>SolidWorks Training Program</h2>
+                                <p>We provide expert training in SolidWorks, focusing on the practical application of CAD software. Our program is designed to equip students with the necessary skills to work in the industry, preparing them for a variety of engineering and design roles.</p>
+                                <ul class="list-style-two">
+                                    <li>Hands-on experience with SolidWorks</li>
+                                    <li>Industry-focused curriculum</li>
+                                    <li>Certification from an Autodesk Authorized Center</li>
+                                </ul>
+                                <a href="#" class="theme-btn btn-style-one"><span class="txt">Learn More</span></a>
+                            </div>
+                        </div>
+
+                        <!--Tab -->
+                        <div class="tab" id="feature-tab-3">
+                            <div class="inner-box">
+                                <span class="title">Why Choose Us?</span>
+                                <h2>CNC Program Training</h2>
+                                <p>Our CNC Program Training is designed to give students practical skills in computer numerical control systems. From programming to machine operation, we prepare you for a career in manufacturing and engineering, backed by industry certifications.</p>
+                                <ul class="list-style-two">
+                                    <li>Comprehensive CNC programming courses</li>
+                                    <li>Hands-on training with real machines</li>
+                                    <li>Expert instructors with industry experience</li>
+                                </ul>
+                                <a href="#" class="theme-btn btn-style-one"><span class="txt">Get Started</span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-column col-lg-5 col-md-12 col-sm-12">
+                    <!--Tab Btns-->
+                    <ul class="tab-btns tab-buttons clearfix">
+                        <li data-tab="#feature-tab-1" class="tab-btn active-btn">
+                            <div class="icon-box"><span class="flaticon-settings-2"></span></div>
+                            <h3>Authorized Certification Center</h3>
+                            <p>We are an Authorized Certification Center for Autodesk, providing industry-standard certification and training programs.</p>
+                        </li>
+                        <li data-tab="#feature-tab-2" class="tab-btn">
+                            <div class="icon-box"><span class="flaticon-gear"></span></div>
+                            <h3>SolidWorks Training</h3>
+                            <p>Our SolidWorks Training Program equips students with essential skills for a career in design and engineering.</p>
+                        </li>
+                        <li data-tab="#feature-tab-3" class="tab-btn">
+                            <div class="icon-box"><span class="flaticon-conveyor"></span></div>
+                            <h3>CNC Program Training</h3>
+                            <p>Our CNC Program prepares you for a career in the manufacturing industry with expert training on machine operation and programming.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Why Us Section -->
+
+<%- include('partials/footer') %>

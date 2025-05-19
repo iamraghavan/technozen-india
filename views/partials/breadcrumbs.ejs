@@ -1,0 +1,18 @@
+<!-- breadcrumbs.ejs (Complete Page Title + Breadcrumbs Component) -->
+<section class="page-title" style="background-image:url(assets/r_files/breadcrumbs.webp)">
+    <div class="auto-container">
+        <h1><%= title %></h1> <!-- Dynamic title from the controller -->
+        <ul class="page-breadcrumb">
+            <% breadcrumbs.forEach((breadcrumb, index) => { %>
+                <li>
+                    <% if (index < breadcrumbs.length - 1) { %>
+                        <a href="<%= breadcrumb.link %>"><%= breadcrumb.text %></a>
+                    <% } else { %>
+                        <span><%= breadcrumb.text %></span>
+                    <% } %>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+</section>
+<!-- End Page Title -->

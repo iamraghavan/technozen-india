@@ -1,0 +1,85 @@
+<%- include('partials/header') %>
+
+<!--Main Slider-->
+<section class="main-slider">
+    <div class="main-slider-carousel owl-carousel owl-theme">
+
+        <div class="slide" style="background-image:url(/assets/r_files/slider_solidworks.webp)">
+            <div class="overlay"></div> <!-- Black shade overlay -->
+            <div class="auto-container">
+                <div class="content-outer left-align">
+                    <div class="content">
+                        <div class="title">SolidWorks Training Program</div>
+                        <h1>Master SolidWorks with Industrial Certification</h1>
+                        <div class="text">We offer comprehensive SolidWorks training to help you master CAD design and prepare for industry-level challenges. Our program is designed for both engineering students and corporate professionals.</div>
+                        <div class="link-box">
+                            <a href="solidworks-training.html" class="theme-btn btn-style-two"><span class="btn-txt">Enroll Now</span></a> 
+                            <a href="contact.html" class="theme-btn btn-style-two"><span class="btn-txt">Contact Now</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" style="background-image:url(/assets/r_files/slider_cnc.webp)">
+            <div class="overlay"></div> <!-- Black shade overlay -->
+            <div class="auto-container">
+                <div class="content-outer center-align">
+                    <div class="content">
+                        <div class="title">CNC Training Program</div>
+                        <h1>Learn CNC Operations with Certification</h1>
+                        <div class="text">Our CNC training program equips you with the skills to operate CNC machines, enhancing your knowledge for industrial applications. Whether you’re an engineering student or a corporate professional, this course is for you.</div>
+                        <div class="link-box">
+                            <a href="cnc-training.html" class="theme-btn btn-style-two"><span class="btn-txt">Enroll Now</span></a> 
+                            <a href="contact.html" class="theme-btn btn-style-two"><span class="btn-txt">Contact Now</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="auto-container">
+        <!-- Social Box -->
+        <div class="social-box">
+            <a href="#"><span class="fa fa-facebook"></span></a>
+            <a href="#"><span class="fa fa-twitter"></span></a>
+            <a href="#"><span class="fa fa-linkedin"></span></a>
+            <a href="#"><span class="fa fa-youtube"></span></a>
+        </div>
+    </div>
+
+    <!--Scroll Down Btn-->
+    <div class="mouse-btn-down scroll-to-target" data-target=".call-to-action-section">
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+    </div>
+</section>
+<!--End Main Slider-->
+
+<%- include('partials/footer') %>
+<style>
+    .main-slider .slide {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+}
+
+.main-slider .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+    z-index: 1;
+}
+
+.main-slider .auto-container {
+    position: relative;
+    z-index: 2; /* Ensure text is above the overlay */
+}
+
+</style>
