@@ -1,7 +1,6 @@
-<!-- breadcrumbs.ejs (Complete Page Title + Breadcrumbs Component) -->
-<section class="page-title" style="background-image:url(assets/r_files/breadcrumbs.webp)">
+<section class="page-title" style="background-image:url(/assets/r_files/breadcrumbs.webp)">
     <div class="auto-container">
-        <h1><%= title %></h1> <!-- Dynamic title from the controller -->
+        <h1><%= title %></h1>
         <ul class="page-breadcrumb">
             <% breadcrumbs.forEach((breadcrumb, index) => { %>
                 <li>
@@ -15,4 +14,3 @@
         </ul>
     </div>
 </section>
-<!-- End Page Title -->

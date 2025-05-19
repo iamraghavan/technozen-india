@@ -15,6 +15,19 @@ exports.aboutPage = (req, res) => {
   });
 };
 
+exports.studentDeskPage = (req, res) => {
+  const breadcrumbs = [
+    { text: 'Home', link: '/' }, 
+    { text: 'Student Desk', link: '/student-desk' }
+  ];
+  const pageTitle = 'Student Desk';
+  
+  res.render('student-desk', { 
+    title: pageTitle,
+    breadcrumbs: breadcrumbs
+  });
+};
+
 exports.contactPage = (req, res) => {
   res.render('contact', { title: 'Contact Us' });
 };
