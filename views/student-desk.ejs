@@ -1,11 +1,241 @@
-<!-- Main Template (about.ejs) -->
- <%- include('partials/header') %>
+<%- include('partials/header') %>
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+</head>
 
 <%- include('partials/breadcrumbs', { 
     title: title, 
     breadcrumbs: breadcrumbs 
 }) %>
 
+<section class="students-desk">
+    <div class="auto-container">
+       
+
+        <!-- Admission Form -->
+        <div class="admission-details">
+            <div class="shop-form">
+                <form method="post" action="/student-desk/admission" id="admissionForm" novalidate>
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="row clearfix">
+                        <div class="col-lg-7 col-md-12 col-sm-12">
+                            <div class="sec-title"><h1>Admission Details</h1></div>
+                            <div class="admission-inner">
+                                <div class="row clearfix">
+                                    <!-- Center Name -->
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                        <div class="field-label">Center Name <sup>*</sup></div>
+                                        <select name="centerName" required>
+                                            <option value="">--Select--</option>
+                                            <option value="Technozen India - Ambattur">Technozen India - Ambattur</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Student Information -->
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">First Name <sup>*</sup></div>
+                                        <input type="text" name="firstName" value="" placeholder="First Name" required pattern="[A-Za-z]+" title="Only letters are allowed" spellcheck="false">
+                                    </div>
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Middle Name</div>
+                                        <input type="text" name="middleName" value="" placeholder="Middle Name" pattern="[A-Za-z]*" title="Only letters are allowed" spellcheck="false">
+                                    </div>
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Last Name <sup>*</sup></div>
+                                        <input type="text" name="lastName" value="" placeholder="Last Name" required pattern="[A-Za-z]+" title="Only letters are allowed" spellcheck="false">
+                                    </div>
+                                     <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Contact Number <sup>*</sup></div>
+                                        <input type="tel" id="contactNumber" name="contactNumber" value="" placeholder="Contact Number" required title="Enter a valid phone number">
+                                    </div>
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                        <div class="field-label">Email ID <sup>*</sup></div>
+                                        <input type="email" name="emailId" value="" placeholder="Email ID" required>
+                                    </div>
+
+                                    <!-- Education -->
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                        <div class="field-label">College Name</div>
+                                        <input type="text" name="collegeName" value="" placeholder="College Name" spellcheck="false">
+                                    </div>
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                        <div class="field-label">Education Qualification <sup>*</sup></div>
+                                        <select name="educationQualification" required>
+                                            <option value="">--Select--</option>
+                                            <option value="Diploma">Diploma</option>
+                                            <option value="B.E./B.Tech">B.E./B.Tech</option>
+                                            <option value="M.E./M.Tech">M.E./M.Tech</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Course Information -->
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Course Interested In <sup>*</sup></div>
+                                        <select name="courseInterested" id="courseInterested" required>
+                                            <option value="">--Select--</option>
+                                            <option value="Mechanical">Mechanical</option>
+                                            <option value="Civil">Civil</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Sub Course <sup>*</sup></div>
+                                        <select name="subCourse" id="subCourse" required>
+                                            <option value="">--Select--</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Expected Joining Date <sup>*</sup></div>
+                                        <input type="date" name="joiningDate" id="joiningDate" required min="<%= new Date().toISOString().split('T')[0] %>">
+                                    </div>
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Expected Joining Month <sup>*</sup></div>
+                                        <select name="joiningMonth" required>
+                                            <option value="">--Select--</option>
+                                            <% for (let i = 0; i < 12; i++) { %>
+                                                <option value="<%= new Date(new Date().setMonth(new Date().getMonth() + i)).toLocaleString('default', { month: 'long', year: 'numeric' }) %>">
+                                                    <%= new Date(new Date().setMonth(new Date().getMonth() + i)).toLocaleString('default', { month: 'long', year: 'numeric' }) %>
+                                                </option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                        <div class="field-label">Batch Time <sup>*</sup></div>
+                                        <select name="batchTime" required>
+                                            <option value="">--Select--</option>
+                                            <% for (let hour = 9; hour <= 17; hour++) { %>
+                                                <option value="<%= hour %>:00 AM - <%= hour + 1 %>:00 AM"><%= hour %>:00 AM - <%= hour + 1 %>:00 AM</option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+
+                                    <!-- Professional Information -->
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Current Designation</div>
+                                        <input type="text" name="currentDesignation" value="" placeholder="Current Designation" spellcheck="false">
+                                    </div>
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Current Company Name</div>
+                                        <input type="text" name="currentCompanyName" value="" placeholder="Current Company Name" spellcheck="false">
+                                    </div>
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Total Years of Experience <sup>*</sup></div>
+                                        <select name="yearsOfExperience" required>
+                                            <option value="">--Years--</option>
+                                            <% for (let i = 0; i <= 20; i++) { %>
+                                                <option value="<%= i %>"><%= i %> Years</option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <div class="field-label">Occupation <sup>*</sup></div>
+                                        <select name="occupation" required>
+                                            <option value="">--Select--</option>
+                                            <option value="Student">Student</option>
+                                            <option value="Professional">Professional</option>
+                                            <option value="Fresher">Fresher</option>
+                                            <option value="Entrepreneur">Entrepreneur</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Remarks -->
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                        <div class="field-label">Remarks</div>
+                                        <textarea name="remarks" placeholder="Any additional notes or remarks" spellcheck="false"></textarea>
+                                    </div>
+<!-- 
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+  <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY_HERE"></div>
+</div> -->
+
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                <button type="submit" class="theme-btn btn-style-two"><span class="btn-txt">Submit Application</span></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
+
+         <!-- form.addEventListener('submit', function(event) {
+  const captchaResponse = grecaptcha.getResponse();
+  if (captchaResponse.length === 0) {
+    alert('Please complete the reCAPTCHA.');
+    event.preventDefault();
+    return;
+  }
+}); -->
 
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseSelect = document.getElementById('courseInterested');
+            const subCourseSelect = document.getElementById('subCourse');
+            const form = document.getElementById('admissionForm');
+
+   
+
+
+            // Initialize intl-tel-input
+        const phoneInputField = document.querySelector("#contactNumber");
+        const phoneInput = window.intlTelInput(phoneInputField, {
+            initialCountry: "in", // Default to India
+            separateDialCode: true, // Show dial code separately
+            autoPlaceholder: "polite", // Show example number
+            formatOnDisplay: true, // Format as user types
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+        });
+
+            // Dynamic Sub Course options based on Course Interested
+            courseSelect.addEventListener('change', function() {
+                subCourseSelect.innerHTML = '<option value="">--Select--</option>';
+                if (this.value === 'Mechanical') {
+                    subCourseSelect.innerHTML += `
+                        <option value="SOLIDWORKS">SOLIDWORKS</option>
+                        <option value="CNC Programming">CNC Programming</option>
+                    `;
+                }
+            });
+
+            // Client-side validation
+            form.addEventListener('submit', function(event) {
+                const firstName = form.querySelector('input[name="firstName"]').value;
+                const lastName = form.querySelector('input[name="lastName"]').value;
+                const contactNumber = form.querySelector('input[name="contactNumber"]').value;
+                const emailId = form.querySelector('input[name="emailId"]').value;
+
+                // Additional validation for email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailId)) {
+                    alert('Please enter a valid email address.');
+                    event.preventDefault();
+                    return;
+                }
+
+                // Phone number validation (10 digits)
+                if (!phoneInput.isValidNumber()) {
+    alert('Please enter a valid phone number.');
+    event.preventDefault();
+    return;
+}
+
+
+                // Ensure names contain only letters
+                if (!/^[A-Za-z]+$/.test(firstName) || !/^[A-Za-z]+$/.test(lastName)) {
+                    alert('First and Last Name should contain only letters.');
+                    event.preventDefault();
+                    return;
+                }
+            });
+        });
+    </script>
 <%- include('partials/footer') %>
