@@ -1,3 +1,7 @@
+const fs = require('fs');
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+
 const homePage = (req, res) => {
     res.render('index', {
         layout: 'layouts/default',
@@ -26,9 +30,53 @@ const contactPage = (req, res) => {
     res.render('contact', {
         title: 'Contact Technozen India',
         description: 'Get in touch with Technozen India for CNC and SOLIDWORKS training inquiries in Chennai.',
-        breadcrumbs
+        breadcrumbs,
+        csrfToken: req.csrfToken(),
+        
     });
 };
+
+const submitContactForm = (req, res) => {
+  const { username, email, subject, phone, message } = req.body;
+
+  const newEnquiry = {
+    enquiry_id: uuidv4(),  // generate enquiry_id
+    username,
+    email,
+    subject,
+    phone,
+    message,
+    date: new Date().toISOString(),       // enquiry submission datetime
+    timestamp: Date.now()                 // numeric timestamp (optional if you want)
+  };
+
+  const filePath = path.join(__dirname, '../data/contact_enquiry.json');
+
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    let enquiries = [];
+    if (!err && data) {
+      try {
+        enquiries = JSON.parse(data);
+      } catch (parseErr) {
+        console.error('Error parsing JSON:', parseErr);
+        return res.status(500).send('Error parsing existing enquiries.');
+      }
+    }
+
+    enquiries.push(newEnquiry);
+
+    fs.writeFile(filePath, JSON.stringify(enquiries, null, 2), (err) => {
+      if (err) {
+        console.error('Error writing file:', err);
+        return res.status(500).send('Error saving enquiry.');
+      }
+
+      // Redirect with query parameters
+      return res.redirect(`/contact?success=true&enquiry_id=${newEnquiry.enquiry_id}`);
+    });
+  });
+};
+
 
 const studentDeskPage = (req, res) => {
     const breadcrumbs = [
@@ -75,5 +123,6 @@ module.exports = {
     contactPage,
     studentDeskPage,
     solidWorksTrainingPage,
-    cncProgramTrainingPage
+    cncProgramTrainingPage,
+    submitContactForm
 };

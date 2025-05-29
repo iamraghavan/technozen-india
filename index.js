@@ -27,20 +27,24 @@ app.use(
         "default-src": ["'self'"],
         "script-src": [
           "'self'",
-           "https://www.google.com", "https://www.gstatic.com", // Google APIs
-          "'unsafe-inline'",  // Allow inline JS — be cautious
-          "https://cdnjs.cloudflare.com", // Example CDN (Cloudflare)
+          "https://www.google.com",
+          "https://www.gstatic.com",
+          "'unsafe-inline'",
+          "https://cdnjs.cloudflare.com",
           "https://cdn.jsdelivr.net"
         ],
         "style-src": [
           "'self'",
-          "'unsafe-inline'",  // Allow inline styles
+          "'unsafe-inline'",
           "https://cdnjs.cloudflare.com",
-          "https://cdn.jsdelivr.net"
+          "https://cdn.jsdelivr.net",
+          "https://fonts.googleapis.com", // Added for Google Fonts
+          "https://fonts.gstatic.com"    // Added for font files
         ],
         "frame-src": ["'self'", "https://www.google.com"],
         "img-src": ["'self'", "data:", "https://cdnjs.cloudflare.com"],
         "connect-src": ["'self'", "https://ipapi.co"],
+        "font-src": ["'self'", "https://fonts.gstatic.com"] // Added for font files
       },
     },
   })
@@ -81,6 +85,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/', pageRoutes);
+
 
 // 404 handler
 app.use((req, res) => {

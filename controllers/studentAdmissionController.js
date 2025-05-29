@@ -1,125 +1,52 @@
 const fs = require('fs').promises;
 const path = require('path');
 const sanitizeHtml = require('sanitize-html');
-const nodemailer = require('nodemailer');
-require('dotenv').config();
 
-
-// JSON admissions file path
+/**
+ * Path to JSON file for storing admissions.
+ * @constant {string}
+ */
 const admissionsFile = path.join(__dirname, '../data/admissions.json');
 
-// Generate unique student ID
+/**
+ * Generates a unique student admission ID.
+ * @param {string} subCourse - The selected sub-course.
+ * @returns {string} - Format: TIND/[SOL|CNC]/5digits.
+ */
 function generateStudentId(subCourse) {
     const courseCode = subCourse === 'SOLIDWORKS' ? 'SOL' : 'CNC';
     const randomNum = Math.floor(10000 + Math.random() * 90000);
     return `TIND/${courseCode}/${randomNum}`;
 }
 
-// Initialize admissions file if not exists
+/**
+ * Initializes the admissions JSON file and its parent directory if they don't exist.
+ * @returns {Promise<void>}
+ * @throws {Error} - If file/directory creation fails.
+ */
 async function initializeAdmissionsFile() {
     try {
+        // Check if file exists
         await fs.access(admissionsFile);
-    } catch {
-        const dir = path.dirname(admissionsFile);
-        await fs.mkdir(dir, { recursive: true });
-        await fs.writeFile(admissionsFile, JSON.stringify([], null, 2), 'utf8');
+    } catch (error) {
+        try {
+            // Ensure parent directory exists
+            const dir = path.dirname(admissionsFile);
+            await fs.mkdir(dir, { recursive: true });
+            // Create empty JSON file
+            await fs.writeFile(admissionsFile, JSON.stringify([], null, 2), 'utf8');
+        } catch (dirError) {
+            throw new Error(`Failed to initialize admissions file: ${dirError.message}`);
+        }
     }
 }
 
-// Nodemailer transporter config
-
-const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  port: process.env.MAIL_PORT,
-  secure: process.env.MAIL_ENCRYPTION === 'ssl', // true for port 465
-  auth: {
-    user: process.env.MAIL_USERNAME,
-    pass: process.env.MAIL_PASSWORD
-  },
-  logger: true,
-  debug: true,
-  tls: {
-    rejectUnauthorized: false
-  }
-});
-
-
-// Mail template generator
-function generateMailTemplate(data) {
-    return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                background-color: #ffffff;
-                color: #000000;
-                margin: 0;
-                padding: 0;
-            }
-            .header {
-                background-color: #FF671F;
-                padding: 20px;
-                text-align: center;
-                color: #ffffff;
-            }
-            .content {
-                padding: 20px;
-            }
-            .details {
-                background-color: #f5f5f5;
-                padding: 15px;
-                border-radius: 8px;
-                margin-top: 20px;
-            }
-            .details p {
-                margin: 6px 0;
-            }
-            .footer {
-                background-color: #046A38;
-                color: #ffffff;
-                text-align: center;
-                padding: 10px;
-                margin-top: 30px;
-            }
-            .highlight {
-                color: #00928b;
-                font-weight: bold;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <h1>Thank you for your Admission, ${data.firstName}!</h1>
-        </div>
-        <div class="content">
-            <p>Dear ${data.firstName} ${data.middleName} ${data.lastName},</p>
-            <p>We have successfully received your admission form. Below are your details:</p>
-            <div class="details">
-                <p><strong>Admission ID:</strong> ${data.student_admission_id}</p>
-                <p><strong>Center Name:</strong> ${data.centerName}</p>
-                <p><strong>Email:</strong> ${data.emailId}</p>
-                <p><strong>Contact Number:</strong> ${data.contactNumber}</p>
-                <p><strong>Course:</strong> ${data.courseInterested}</p>
-                <p><strong>Sub Course:</strong> ${data.subCourse}</p>
-                <p><strong>Joining Date:</strong> ${data.joiningDate}</p>
-                <p><strong>Batch Time:</strong> ${data.batchTime}</p>
-                <p><strong>Occupation:</strong> ${data.occupation}</p>
-                <p><strong>Years of Experience:</strong> ${data.yearsOfExperience}</p>
-            </div>
-            <p style="margin-top:20px;">For any queries, feel free to contact us.</p>
-            <p>Regards,<br><span class="highlight">Technozen India</span></p>
-        </div>
-        <div class="footer">
-            &copy; ${new Date().getFullYear()} Technozen India. All rights reserved.
-        </div>
-    </body>
-    </html>
-    `;
-}
-
-// Controller: Submit admission form
+/**
+ * Submits and validates the admission form.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 const submitAdmissionForm = async (req, res) => {
     try {
         const {
@@ -129,7 +56,7 @@ const submitAdmissionForm = async (req, res) => {
             currentCompanyName, yearsOfExperience, occupation, remarks
         } = req.body;
 
-        // Validation
+        // Validation rules
         if (!centerName || !centerName.includes('Technozen India')) {
             return res.status(400).json({ error: 'Center name must include "Technozen India".' });
         }
@@ -139,8 +66,11 @@ const submitAdmissionForm = async (req, res) => {
         if (middleName && !/^[A-Za-z]*$/.test(middleName)) {
             return res.status(400).json({ error: 'Middle Name must contain only letters.' });
         }
-        if (!contactNumber || !/^\+\d{1,15}$/.test(contactNumber)) {
-            return res.status(400).json({ error: 'Contact number must be in international format.' });
+        if (!contactNumber) {
+            return res.status(400).json({ error: 'Contact number is required.' });
+        }
+        if (!/^\+\d{1,15}$/.test(contactNumber)) {
+            return res.status(400).json({ error: 'Contact number must be in international format (e.g., +919876543210).' });
         }
         if (!emailId || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailId)) {
             return res.status(400).json({ error: 'Invalid email address.' });
@@ -195,30 +125,37 @@ const submitAdmissionForm = async (req, res) => {
             createdAt: new Date().toISOString(),
         };
 
-        // Initialize file
+        // Initialize file and read admissions
         await initializeAdmissionsFile();
-        let admissions = [];
+        let admissions;
         try {
             const data = await fs.readFile(admissionsFile, 'utf8');
             admissions = JSON.parse(data || '[]');
-        } catch {
+        } catch (readError) {
+            // If read fails (e.g., corrupted file), reset to empty array
             admissions = [];
+            await fs.writeFile(admissionsFile, JSON.stringify(admissions, null, 2), 'utf8');
         }
+
+        // Add new admission
         admissions.push(sanitizedData);
-        await fs.writeFile(admissionsFile, JSON.stringify(admissions, null, 2), 'utf8');
 
-        // Send acknowledgement mail
-        await transporter.sendMail({
-  from: `"Technozen India" <noreply@srithiruthanibuildersandfoundation.com>`,
-  to: sanitizedData.emailId,
-  subject: `Acknowledgement - Admission ID: ${sanitizedData.student_admission_id}`,
-  html: generateMailTemplate(sanitizedData)
-});
+        // Write back to JSON file
+        try {
+            await fs.writeFile(admissionsFile, JSON.stringify(admissions, null, 2), 'utf8');
+        } catch (writeError) {
+            throw new Error(`Failed to write to admissions file: ${writeError.message}`);
+        }
 
+        // return res.status(200).json({
+        //     message: 'Admission form submitted successfully!',
+        //     student_admission_id: sanitizedData.student_admission_id,
+        // });
 
         return res.redirect(`/student-desk?success=true&student_id=${sanitizedData.student_admission_id}`);
+
     } catch (error) {
-        console.error('Admission form error:', error);
+        console.error('Error processing admission form:', error);
         return res.status(500).json({ error: `Server error: ${error.message}` });
     }
 };

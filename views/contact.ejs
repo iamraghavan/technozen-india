@@ -5,6 +5,100 @@
     breadcrumbs: breadcrumbs 
 }) %>
 
+<section class="contact-page-section">
+  <div class="auto-container">
+    <div class="row clearfix">
+      
+      <!-- Form Column -->
+      <div class="form-column col-lg-8 col-md-12 col-sm-12">
+        <div class="inner-column">
+          
+          <!-- Sec Title -->
+          <div class="sec-title">
+            <h1>Contact Us</h1>
+          </div>
+          
+          <!-- Contact Form -->
+          <div class="contact-form">
+            <form method="POST" action="/contact" id="contact-form">
+                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <div class="row clearfix">
+                
+                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                  <input type="text" name="username" placeholder="Name" required>
+                </div>
+                
+                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                  <input type="email" name="email" placeholder="Email" required>
+                </div>
+                
+                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                  <input type="text" name="subject" placeholder="Subject" required>
+                </div>
+                
+                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                  <input type="text" name="phone" placeholder="Phone" required>
+                </div>
+                
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <textarea name="message" placeholder="Message" required></textarea>
+                </div>
+              
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <button class="theme-btn btn-style-one" type="submit">
+                    <span class="txt">Send Now</span>
+                  </button>
+                </div>
+                
+              </div>
+            </form>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- Info Column -->
+      <div class="info-column col-lg-4 col-md-12 col-sm-12">
+        <div class="inner-column">
+          <div class="sec-title">
+            <h1>Contact Information</h1>
+          </div>
+          <div class="content-boxed">
+							<div class="text">For any kind of query, contact us with the details below.</div>
+							<ul>
+								<li><span class="icon fa fa-phone"></span>+000 (000) 000 00</li>
+								<li><span class="icon fa fa-envelope"></span>contact@technozenindia.in</li>
+								<li><span class="icon fa fa-map-marker"></span>Sample Address 1, Sample Address 2, Sample Addresss 3</li>
+								<li><span class="icon fa fa-clock-o"></span>Opening Hours : Monday - Satureday   9:00 am  to  5pm</li>
+							</ul>
+						</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SweetAlert -->
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const success = urlParams.get('success');
+  const studentId = urlParams.get('enquiry_id');
+
+  if (success === 'true') {
+    Swal.fire({
+      icon: 'success',
+      title: 'Request Submitted successfully !',
+      showConfirmButton: true,
+      confirmButtonText: 'OK'
+    }).then(() => {
+      // Optionally remove query params from URL after displaying alert
+      window.history.replaceState(null, null, window.location.pathname);
+    });
+  }
+</script>
 
 
 <%- include('partials/footer') %>

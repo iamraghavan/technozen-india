@@ -1,2 +1,5 @@
 /.env
 /node_modules
+/data
+/data/admissions.json
+/data/contact_enquiry.json
