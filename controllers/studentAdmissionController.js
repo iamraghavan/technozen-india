@@ -1,26 +1,125 @@
 const fs = require('fs').promises;
 const path = require('path');
 const sanitizeHtml = require('sanitize-html');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
-// Path to JSON file for storing admissions
+
+// JSON admissions file path
 const admissionsFile = path.join(__dirname, '../data/admissions.json');
 
-// Generate unique student admission ID (TIND/[SOL|CNC]/5digits)
+// Generate unique student ID
 function generateStudentId(subCourse) {
     const courseCode = subCourse === 'SOLIDWORKS' ? 'SOL' : 'CNC';
     const randomNum = Math.floor(10000 + Math.random() * 90000);
     return `TIND/${courseCode}/${randomNum}`;
 }
 
-// Initialize JSON file
+// Initialize admissions file if not exists
 async function initializeAdmissionsFile() {
     try {
         await fs.access(admissionsFile);
-    } catch (error) {
-        await fs.writeFile(admissionsFile, JSON.stringify([]));
+    } catch {
+        const dir = path.dirname(admissionsFile);
+        await fs.mkdir(dir, { recursive: true });
+        await fs.writeFile(admissionsFile, JSON.stringify([], null, 2), 'utf8');
     }
 }
 
+// Nodemailer transporter config
+
+const transporter = nodemailer.createTransport({
+  host: process.env.MAIL_HOST,
+  port: process.env.MAIL_PORT,
+  secure: process.env.MAIL_ENCRYPTION === 'ssl', // true for port 465
+  auth: {
+    user: process.env.MAIL_USERNAME,
+    pass: process.env.MAIL_PASSWORD
+  },
+  logger: true,
+  debug: true,
+  tls: {
+    rejectUnauthorized: false
+  }
+});
+
+
+// Mail template generator
+function generateMailTemplate(data) {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #ffffff;
+                color: #000000;
+                margin: 0;
+                padding: 0;
+            }
+            .header {
+                background-color: #FF671F;
+                padding: 20px;
+                text-align: center;
+                color: #ffffff;
+            }
+            .content {
+                padding: 20px;
+            }
+            .details {
+                background-color: #f5f5f5;
+                padding: 15px;
+                border-radius: 8px;
+                margin-top: 20px;
+            }
+            .details p {
+                margin: 6px 0;
+            }
+            .footer {
+                background-color: #046A38;
+                color: #ffffff;
+                text-align: center;
+                padding: 10px;
+                margin-top: 30px;
+            }
+            .highlight {
+                color: #00928b;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Thank you for your Admission, ${data.firstName}!</h1>
+        </div>
+        <div class="content">
+            <p>Dear ${data.firstName} ${data.middleName} ${data.lastName},</p>
+            <p>We have successfully received your admission form. Below are your details:</p>
+            <div class="details">
+                <p><strong>Admission ID:</strong> ${data.student_admission_id}</p>
+                <p><strong>Center Name:</strong> ${data.centerName}</p>
+                <p><strong>Email:</strong> ${data.emailId}</p>
+                <p><strong>Contact Number:</strong> ${data.contactNumber}</p>
+                <p><strong>Course:</strong> ${data.courseInterested}</p>
+                <p><strong>Sub Course:</strong> ${data.subCourse}</p>
+                <p><strong>Joining Date:</strong> ${data.joiningDate}</p>
+                <p><strong>Batch Time:</strong> ${data.batchTime}</p>
+                <p><strong>Occupation:</strong> ${data.occupation}</p>
+                <p><strong>Years of Experience:</strong> ${data.yearsOfExperience}</p>
+            </div>
+            <p style="margin-top:20px;">For any queries, feel free to contact us.</p>
+            <p>Regards,<br><span class="highlight">Technozen India</span></p>
+        </div>
+        <div class="footer">
+            &copy; ${new Date().getFullYear()} Technozen India. All rights reserved.
+        </div>
+    </body>
+    </html>
+    `;
+}
+
+// Controller: Submit admission form
 const submitAdmissionForm = async (req, res) => {
     try {
         const {
@@ -30,9 +129,9 @@ const submitAdmissionForm = async (req, res) => {
             currentCompanyName, yearsOfExperience, occupation, remarks
         } = req.body;
 
-        // Validation rules
+        // Validation
         if (!centerName || !centerName.includes('Technozen India')) {
-            return res.status(400).json({ error: 'Invalid center name.' });
+            return res.status(400).json({ error: 'Center name must include "Technozen India".' });
         }
         if (!firstName || !lastName || !/^[A-Za-z]+$/.test(firstName) || !/^[A-Za-z]+$/.test(lastName)) {
             return res.status(400).json({ error: 'First and Last Name must contain only letters.' });
@@ -40,9 +139,8 @@ const submitAdmissionForm = async (req, res) => {
         if (middleName && !/^[A-Za-z]*$/.test(middleName)) {
             return res.status(400).json({ error: 'Middle Name must contain only letters.' });
         }
-        // Updated validation for international phone numbers (E.164 format: + followed by 1-15 digits)
         if (!contactNumber || !/^\+\d{1,15}$/.test(contactNumber)) {
-            return res.status(400).json({ error: 'Contact number must be a valid international number (e.g., +1234567890).' });
+            return res.status(400).json({ error: 'Contact number must be in international format.' });
         }
         if (!emailId || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailId)) {
             return res.status(400).json({ error: 'Invalid email address.' });
@@ -62,11 +160,12 @@ const submitAdmissionForm = async (req, res) => {
         if (!joiningMonth) {
             return res.status(400).json({ error: 'Joining month is required.' });
         }
-        if (!batchTime || !batchTime.match(/^\d{1,2}:00 AM - \d{1,2}:00 AM$/)) {
-            return res.status(400).json({ error: 'Invalid batch time.' });
+        if (!batchTime || !/^\d{1,2}:00 AM - \d{1,2}:00 AM$/.test(batchTime)) {
+            return res.status(400).json({ error: 'Invalid batch time format.' });
         }
-        if (!yearsOfExperience || isNaN(yearsOfExperience) || yearsOfExperience < 0 || yearsOfExperience > 20) {
-            return res.status(400).json({ error: 'Invalid years of experience.' });
+        const yearsExp = parseInt(yearsOfExperience, 10);
+        if (isNaN(yearsExp) || yearsExp < 0 || yearsExp > 20) {
+            return res.status(400).json({ error: 'Years of experience must be between 0 and 20.' });
         }
         if (!occupation || !['Student', 'Professional', 'Fresher', 'Entrepreneur'].includes(occupation)) {
             return res.status(400).json({ error: 'Invalid occupation.' });
@@ -89,31 +188,39 @@ const submitAdmissionForm = async (req, res) => {
             batchTime: sanitizeHtml(batchTime),
             currentDesignation: sanitizeHtml(currentDesignation || ''),
             currentCompanyName: sanitizeHtml(currentCompanyName || ''),
-            yearsOfExperience: parseInt(yearsOfExperience),
+            yearsOfExperience: yearsExp,
             occupation: sanitizeHtml(occupation),
             remarks: sanitizeHtml(remarks || ''),
             student_admission_id: generateStudentId(subCourse),
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
         };
 
-        // Read existing admissions
+        // Initialize file
         await initializeAdmissionsFile();
-        const admissions = JSON.parse(await fs.readFile(admissionsFile));
-
-        // Add new admission
+        let admissions = [];
+        try {
+            const data = await fs.readFile(admissionsFile, 'utf8');
+            admissions = JSON.parse(data || '[]');
+        } catch {
+            admissions = [];
+        }
         admissions.push(sanitizedData);
+        await fs.writeFile(admissionsFile, JSON.stringify(admissions, null, 2), 'utf8');
 
-        // Write back to JSON file
-        await fs.writeFile(admissionsFile, JSON.stringify(admissions, null, 2));
+        // Send acknowledgement mail
+        await transporter.sendMail({
+  from: `"Technozen India" <noreply@srithiruthanibuildersandfoundation.com>`,
+  to: sanitizedData.emailId,
+  subject: `Acknowledgement - Admission ID: ${sanitizedData.student_admission_id}`,
+  html: generateMailTemplate(sanitizedData)
+});
 
-        // Respond with success
-        res.status(200).json({ message: 'Admission form submitted successfully!', student_admission_id: sanitizedData.student_admission_id });
+
+        return res.redirect(`/student-desk?success=true&student_id=${sanitizedData.student_admission_id}`);
     } catch (error) {
-        console.error('Error processing admission form:', error);
-        res.status(500).json({ error: 'Server error. Please try again later.' });
+        console.error('Admission form error:', error);
+        return res.status(500).json({ error: `Server error: ${error.message}` });
     }
 };
 
-module.exports = {
-    submitAdmissionForm
-};
+module.exports = { submitAdmissionForm };

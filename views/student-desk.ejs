@@ -47,9 +47,10 @@
                                         <div class="field-label">Last Name <sup>*</sup></div>
                                         <input type="text" name="lastName" value="" placeholder="Last Name" required pattern="[A-Za-z]+" title="Only letters are allowed" spellcheck="false">
                                     </div>
-                                     <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                                                         <div class="form-group col-md-6 col-sm-6 col-xs-12">
                                         <div class="field-label">Contact Number <sup>*</sup></div>
                                         <input type="tel" id="contactNumber" name="contactNumber" value="" placeholder="Contact Number" required title="Enter a valid phone number">
+                                        <span id="phoneError" class="error-text" style="color: red; font-size: 12px; display: none;"></span>
                                     </div>
                                     <div class="form-group col-md-12 col-sm-12 col-xs-12">
                                         <div class="field-label">Email ID <sup>*</sup></div>
@@ -163,10 +164,7 @@
         </div>
     </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
-
-         <!-- form.addEventListener('submit', function(event) {
+        <!-- form.addEventListener('submit', function(event) {
   const captchaResponse = grecaptcha.getResponse();
   if (captchaResponse.length === 0) {
     alert('Please complete the reCAPTCHA.');
@@ -174,68 +172,153 @@
     return;
   }
 }); -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const success = urlParams.get('success');
+  const studentId = urlParams.get('student_id');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const courseSelect = document.getElementById('courseInterested');
-            const subCourseSelect = document.getElementById('subCourse');
-            const form = document.getElementById('admissionForm');
+  if (success === 'true') {
+    Swal.fire({
+      icon: 'success',
+      title: 'Admission Successful!',
+      text: `Your Admission ID is: ${studentId}`,
+      confirmButtonText: 'OK'
+    }).then(() => {
+      // Optionally remove query params from URL after displaying alert
+      window.history.replaceState(null, null, window.location.pathname);
+    });
+  }
+</script>
 
-   
+  <script>
+    'use strict';
 
+    // Initialize International Telephone Input
+    const phoneInputField = document.querySelector("#contactNumber");
+    const phoneError = document.querySelector("#phoneError");
+    const phoneInput = window.intlTelInput(phoneInputField, {
+      initialCountry: "in",
+      separateDialCode: true,
+      autoPlaceholder: "polite",
+      formatOnDisplay: true,
+      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+    });
 
-            // Initialize intl-tel-input
-        const phoneInputField = document.querySelector("#contactNumber");
-        const phoneInput = window.intlTelInput(phoneInputField, {
-            initialCountry: "in", // Default to India
-            separateDialCode: true, // Show dial code separately
-            autoPlaceholder: "polite", // Show example number
-            formatOnDisplay: true, // Format as user types
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('courseInterested').addEventListener('change', updateSubCourses);
+      document.getElementById('admissionForm').addEventListener('submit', handleFormSubmit);
+      phoneInputField.addEventListener('input', validatePhoneRealTime);
+    });
+
+    // Update Sub Courses Dropdown safely
+    function updateSubCourses(event) {
+      const subCourseSelect = document.getElementById('subCourse');
+      const selectedCourse = event.target.value;
+
+      // Clear options
+      while (subCourseSelect.options.length > 1) {
+        subCourseSelect.remove(1);
+      }
+
+      // Populate sub-courses based on selection
+      const courses = {
+        'Mechanical': ['SOLIDWORKS', 'CNC Programming']
+      };
+
+      if (courses[selectedCourse]) {
+        courses[selectedCourse].forEach(course => {
+          const option = document.createElement('option');
+          option.value = course;
+          option.textContent = course;
+          subCourseSelect.appendChild(option);
         });
+      }
+    }
 
-            // Dynamic Sub Course options based on Course Interested
-            courseSelect.addEventListener('change', function() {
-                subCourseSelect.innerHTML = '<option value="">--Select--</option>';
-                if (this.value === 'Mechanical') {
-                    subCourseSelect.innerHTML += `
-                        <option value="SOLIDWORKS">SOLIDWORKS</option>
-                        <option value="CNC Programming">CNC Programming</option>
-                    `;
-                }
-            });
+    // Handle form submission
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      clearErrors();
 
-            // Client-side validation
-            form.addEventListener('submit', function(event) {
-                const firstName = form.querySelector('input[name="firstName"]').value;
-                const lastName = form.querySelector('input[name="lastName"]').value;
-                const contactNumber = form.querySelector('input[name="contactNumber"]').value;
-                const emailId = form.querySelector('input[name="emailId"]').value;
+      const form = event.target;
+      const firstName = form.firstName.value.trim();
+      const lastName = form.lastName.value.trim();
+      const emailId = form.emailId.value.trim();
+      const contactNumber = phoneInputField.value.trim();
 
-                // Additional validation for email format
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(emailId)) {
-                    alert('Please enter a valid email address.');
-                    event.preventDefault();
-                    return;
-                }
+      let hasError = false;
 
-                // Phone number validation (10 digits)
-                if (!phoneInput.isValidNumber()) {
-    alert('Please enter a valid phone number.');
-    event.preventDefault();
-    return;
-}
+      if (!validateName(firstName)) {
+        displayError(form.firstName, 'First Name should contain only letters.');
+        hasError = true;
+      }
 
+      if (!validateName(lastName)) {
+        displayError(form.lastName, 'Last Name should contain only letters.');
+        hasError = true;
+      }
 
-                // Ensure names contain only letters
-                if (!/^[A-Za-z]+$/.test(firstName) || !/^[A-Za-z]+$/.test(lastName)) {
-                    alert('First and Last Name should contain only letters.');
-                    event.preventDefault();
-                    return;
-                }
-            });
-        });
-    </script>
+      if (!validateEmail(emailId)) {
+        displayError(form.emailId, 'Please enter a valid email address.');
+        hasError = true;
+      }
+
+      if (!phoneInput.isValidNumber()) {
+        phoneError.textContent = 'Please enter a valid phone number.';
+        phoneError.style.display = 'block';
+        hasError = true;
+      } else {
+        // Set E.164 format value for submission
+        phoneInputField.value = phoneInput.getNumber();
+      }
+
+      if (!hasError) {
+        form.submit();
+      }
+    }
+
+    // Real-time phone validation
+    function validatePhoneRealTime() {
+      phoneError.style.display = 'none';
+      if (phoneInputField.value.trim() && !phoneInput.isValidNumber()) {
+        phoneError.textContent = 'Invalid phone number.';
+        phoneError.style.display = 'block';
+      }
+    }
+
+    // Validation Functions
+    function validateName(name) {
+      return /^[A-Za-z]+$/.test(name);
+    }
+
+    function validateEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    // Display inline error message
+    function displayError(inputField, message) {
+      let errorSpan = inputField.nextElementSibling;
+      if (!errorSpan || !errorSpan.classList.contains('error-message')) {
+        errorSpan = document.createElement('span');
+        errorSpan.className = 'error-message';
+        inputField.after(errorSpan);
+      }
+      errorSpan.textContent = message;
+      errorSpan.style.display = 'block';
+    }
+
+    // Clear existing errors
+    function clearErrors() {
+      document.querySelectorAll('.error-message').forEach(span => {
+        span.style.display = 'none';
+      });
+    }
+
+  </script>
 <%- include('partials/footer') %>
