@@ -12,7 +12,7 @@ router.get('/contact', csrfProtection, pageController.contactPage);
 router.post('/contact', csrfProtection,pageController.submitContactForm);
 router.get('/student-desk', csrfProtection, pageController.studentDeskPage);
 router.post('/student-desk/admission', csrfProtection, studentAdmissionController.submitAdmissionForm);
-router.get('/training/solidworks', pageController.solidWorksTrainingPage);
+router.get('/training/solid-works', pageController.solidWorksTrainingPage);
 router.get('/training/cnc-program', pageController.cncProgramTrainingPage);
 
 module.exports = router;
